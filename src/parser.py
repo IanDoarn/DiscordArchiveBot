@@ -13,7 +13,7 @@ class SimpleCommandParser:
 
     prefix: str
     message: Message
-    commands: List[Command]
+    commands: Dict[str, Command]
 
     def __init__(
             self,
@@ -23,7 +23,7 @@ class SimpleCommandParser:
     ) -> None:
         self.prefix = prefix
         self.message = message
-        self.commands = commands
+        self.commands = {cmd.name: cmd for cmd in commands}
 
     async def parse_command(self) -> Union[Message, None]:
         content: str = self.message.content
@@ -33,8 +33,11 @@ class SimpleCommandParser:
         # Make sure command starts with the prefix
         if content[:len(self.prefix)] == self.prefix:
             logging.info(f"Command received from {guild} {channel} {self.message.author}! Message: {content}")
-            content_msg = content[len(self.prefix):]
-            if not self.__is_valid_command(content_msg.lower()):
+
+            content_base_command: str = content[len(self.prefix):].split(' ')[0]
+            content_full: list = content[len(self.prefix):].split(' ')
+
+            if not content_base_command.lower() in list(self.commands.keys()):
                 error = ValueError(
                     f"Did not understand command from {guild} {channel} {self.message.author}! Message: {content}"
                 )
@@ -43,13 +46,23 @@ class SimpleCommandParser:
                 )
                 logging.exception(error)
                 raise error
-            elif content_msg.lower() == 'help':
-                return await self.message.author.send(
-                    content=self.help()
+            else:
+                return await self.execute_command(
+                    self.commands[content_base_command],
+                    content_full
                 )
         else:
             return None
 
+    def execute_command(
+            self,
+            cmd: Command,
+            content: list
+    ) -> Union[Message, None]:
+        ...
+
     @staticmethod
     def help() -> str:
         return HELP_MENU
+
+
