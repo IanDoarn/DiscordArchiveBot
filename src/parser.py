@@ -14,15 +14,18 @@ class SimpleCommandParser:
     prefix: str
     message: Message
     commands: Dict[str, Command]
+    config: dict
 
     def __init__(
             self,
             prefix: str,
             message: Message,
-            commands: List[Command]
+            commands: List[Command],
+            config: dict
     ) -> None:
         self.prefix = prefix
         self.message = message
+        self.config = config
         self.commands = {cmd.name: cmd for cmd in commands}
 
     async def parse_command(self) -> Union[Message, None]:
@@ -54,7 +57,11 @@ class SimpleCommandParser:
         function_name = cmd.function
 
         # execute method
-        result = getattr(module, function_name)(self.message, *full_command[1:])
+        result = getattr(module, function_name)(
+            self.message,
+            self.config,
+            *full_command[1:]
+        )
         logging.info(f"Executing {module} {function_name}")
         if result is not None:
             return await self.message.channel.send(result)

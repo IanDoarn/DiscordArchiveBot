@@ -1,5 +1,6 @@
 from typing import Dict, Hashable, Any, List
 import json
+import os
 
 import discord
 import logging
@@ -8,11 +9,12 @@ from discord.message import Message
 
 from discord import Game
 from discord import Status
+from discord.guild import Guild
 
 from src.utils import load_yaml_file
 from src.parser import SimpleCommandParser
 from src.models.command import Command, ProtectionLevel
-
+from src.mapper import GuildMapper
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
@@ -35,6 +37,10 @@ class Bot(discord.Client):
         self.config_file = config_file
 
     async def init(self):
+
+        self.commands = []
+        self.config = dict()
+
         logging.info(f'Logged on as {self.user}')
         logging.info("Loading config file")
         self.config = load_yaml_file(self.config_file)
@@ -54,7 +60,24 @@ class Bot(discord.Client):
             activity=self.presence
         )
 
+        await self.create_guild_mapping()
+
         logging.info(f"Bot is ready")
+
+    async def create_guild_mapping(self):
+        guild_dir = self.config['bot']['guilds']['mapping']['directory']
+        guilds: List[Guild] = self.guilds
+        for guild in guilds:
+            path = os.path.join(guild_dir, guild.name)
+            if not os.path.exists(path):
+                logging.info(f"Creating directory for {guild.name} at {path}")
+                os.mkdir(path)
+                mapper = GuildMapper(guild, path)
+                logging.info(f"Creating mapping for {guild.name} at {path}")
+                mapper.create_guild_map()
+            else:
+                logging.info(f"Found directory for {guild.name} at {path}")
+                pass
 
     def load_commands(self) -> List[Command]:
         cmds: List[Command] = list()
@@ -100,7 +123,8 @@ class Bot(discord.Client):
         scp = SimpleCommandParser(
             prefix=self.command_prefix,
             message=message,
-            commands=self.commands
+            commands=self.commands,
+            config=self.config
         )
 
         # don't respond to ourselves

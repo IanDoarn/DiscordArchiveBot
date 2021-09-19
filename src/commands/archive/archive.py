@@ -1,5 +1,9 @@
 from typing import Dict, Hashable, Any, List
 
+from discord.message import Message
+from discord.channel import TextChannel
+from discord.guild import Guild
+
 
 class Archive:
 

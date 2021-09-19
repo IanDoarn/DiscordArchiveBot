@@ -1,6 +1,9 @@
 bot:
-  command_prefix: "!<"
+  command_prefix: "."
   owner_discord_name: "baxterthehusky#1003"
+  guilds:
+    mapping:
+      directory: "guilds"
   errors:
     message:
       prefix: "oopsie whoopsie~ a fucky wucky happened!"
@@ -9,10 +12,14 @@ bot:
    - name: default
      module: "src.commands.default.default"
      config: "src\\commands\\default\\config.yaml"
-   - name: dummy
-     module: "src.commands.testing.dummy"
-     config: "src\\commands\\testing\\config.yaml"
+   - name: archive
+     module: "src.commands.archive.commands"
+     config: "src\\commands\\archive\\config.yaml"
+
 
 archive:
+  directory: "."
+  dump:
+    file_type: ".json"
   message:
     limit: 1000000

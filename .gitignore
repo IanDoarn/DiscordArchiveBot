@@ -131,7 +131,7 @@ dmypy.json
 # Others
 .zip
 temp/
-
+guilds/
 .idea/
 
 client.json

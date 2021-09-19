@@ -1,0 +1,4 @@
+archive:
+  function: archive
+  protected: false
+  protection_level: "OWNER"
