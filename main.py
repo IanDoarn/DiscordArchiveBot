@@ -20,12 +20,9 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 class Bot(discord.Client):
 
     config: Dict[Hashable, Any] = None
-
     command_prefix: str
     owner_discord_name: str
-
     presence: Game
-
     commands: List[Command] = []
 
     def __init__(
@@ -36,28 +33,6 @@ class Bot(discord.Client):
     ) -> None:
         super().__init__(*args, **kwargs)
         self.config_file = config_file
-
-    def load_commands(self) -> List[Command]:
-        cmds: List[Command] = list()
-        for command_set in self.config["bot"]["commands"]:
-            logging.info(f"Loading {command_set['name']}")
-            config = load_yaml_file(str(command_set['config']))
-            for key, value in config.items():
-                cmd = Command(
-                    name=str(key),
-                    function=value['function'],
-                    module=command_set['module'],
-                    protected=value['protected'],
-                    protection_level=ProtectionLevel[value['protection_level']]
-                )
-                logging.info(f"Loading command {cmd} {cmd.protection_level}")
-                cmds.append(cmd)
-        return cmds
-
-    async def handle_exception(self, message: Message, exc: Exception):
-        msg_prefix = self.config["bot"]["errors"]["message"]["prefix"]
-        msg = f"{msg_prefix}: {exc}"
-        await message.channel.send(content=msg)
 
     async def init(self):
         logging.info(f'Logged on as {self.user}')
@@ -81,8 +56,22 @@ class Bot(discord.Client):
 
         logging.info(f"Bot is ready")
 
-    async def on_ready(self):
-        await self.init()
+    def load_commands(self) -> List[Command]:
+        cmds: List[Command] = list()
+        for command_set in self.config["bot"]["commands"]:
+            logging.info(f"Loading {command_set['name']}")
+            config = load_yaml_file(str(command_set['config']))
+            for key, value in config.items():
+                cmd = Command(
+                    name=str(key),
+                    function=value['function'],
+                    module=command_set['module'],
+                    protected=value['protected'],
+                    protection_level=ProtectionLevel[value['protection_level']]
+                )
+                logging.info(f"Loading command {cmd} {cmd.protection_level}")
+                cmds.append(cmd)
+        return cmds
 
     async def reload(self, message: Message):
         await self.init()
@@ -97,6 +86,14 @@ class Bot(discord.Client):
         await message.channel.send(
             msg
         )
+
+    async def handle_exception(self, message: Message, exc: Exception):
+        msg_prefix = self.config["bot"]["errors"]["message"]["prefix"]
+        msg = f"{msg_prefix}: {exc}"
+        await message.channel.send(content=msg)
+
+    async def on_ready(self):
+        await self.init()
 
     async def on_message(self, message: Message):
 
