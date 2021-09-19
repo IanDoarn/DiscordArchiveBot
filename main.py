@@ -43,13 +43,13 @@ class Bot(discord.Client):
 
     def load_commands(self) -> List[Command]:
         cmds: List[Command] = list()
-        for command, values in self.config["bot"]["commands"]:
+        for command, values in self.config["bot"]["commands"].items():
             cmd = Command(
                 name=command,
                 protected=values['protected'],
                 protection_level=ProtectionLevel[values['protection_level']]
             )
-            logging.info("Loading command")
+            logging.info(f"Loading command {cmd} {cmd.protection_level}")
             cmds.append(cmd)
         return cmds
 

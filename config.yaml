@@ -4,6 +4,7 @@ bot:
   commands:
     help:
       protected: false
+      protection_level: USER
     test:
       protected: true
       protection_level: OWNER
