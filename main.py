@@ -50,8 +50,7 @@ class Bot(discord.Client):
                 protection_level=ProtectionLevel[values['protection_level']]
             )
             logging.info("Loading command")
-            cmds.append(
-            )
+            cmds.append(cmd)
         return cmds
 
     async def on_ready(self):
