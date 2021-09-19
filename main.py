@@ -1,7 +1,7 @@
 from typing import Dict, Hashable, Any, List
 import json
-import datetime
 import os
+import importlib
 
 import discord
 import logging
@@ -43,14 +43,19 @@ class Bot(discord.Client):
 
     def load_commands(self) -> List[Command]:
         cmds: List[Command] = list()
-        for command, values in self.config["bot"]["commands"].items():
-            cmd = Command(
-                name=command,
-                protected=values['protected'],
-                protection_level=ProtectionLevel[values['protection_level']]
-            )
-            logging.info(f"Loading command {cmd} {cmd.protection_level}")
-            cmds.append(cmd)
+        for command_set in self.config["bot"]["commands"]:
+            logging.info(f"Loading {command_set['name']}")
+            config = load_yaml_file(str(command_set['config']))
+            for key, value in config.items():
+                cmd = Command(
+                    name=str(key),
+                    function=value['function'],
+                    module=command_set['module'],
+                    protected=value['protected'],
+                    protection_level=ProtectionLevel[value['protection_level']]
+                )
+                logging.info(f"Loading command {cmd} {cmd.protection_level}")
+                cmds.append(cmd)
         return cmds
 
     async def handle_exception(self, message: Message, exc: Exception):
@@ -58,7 +63,7 @@ class Bot(discord.Client):
         msg = f"{msg_prefix}: {exc}"
         await message.channel.send(content=msg)
 
-    async def on_ready(self):
+    async def init(self):
         logging.info(f'Logged on as {self.user}')
         logging.info("Loading config file")
         self.config = load_yaml_file(self.config_file)
@@ -80,6 +85,23 @@ class Bot(discord.Client):
 
         logging.info(f"Bot is ready")
 
+    async def on_ready(self):
+        await self.init()
+
+    async def reload(self, message: Message):
+        await self.init()
+
+        msg = f"Command prefix is `{self.command_prefix}`\n"
+        msg += f"Owner is {self.owner_discord_name}\n"
+        msg += f"{len(self.commands)} commands reloaded!\n"
+
+        for cmd in self.commands:
+            msg += repr(cmd) + "\n"
+
+        await message.channel.send(
+            msg
+        )
+
     async def on_message(self, message: Message):
 
         scp = SimpleCommandParser(
@@ -91,6 +113,14 @@ class Bot(discord.Client):
         # don't respond to ourselves
         if message.author == self.user:
             return
+
+        if message.content == f"{self.command_prefix}reload":
+            if str(message.author) != self.owner_discord_name:
+                await message.channel.send(
+                    "Error: not authorized"
+                )
+            else:
+                await self.reload(message)
 
         else:
             try:

@@ -9,16 +9,22 @@ class ProtectionLevel(Enum):
 
 class Command:
     name: str
+    module: str
+    function: str
     protected: bool
     protection_level: ProtectionLevel
 
     def __init__(
             self,
             name: str,
+            module: str,
+            function: str,
             protected: bool,
             protection_level: ProtectionLevel = ProtectionLevel.USER
     ):
         self.name = name
+        self.module = module
+        self.function = function
         self.protected = protected
         self.protection_level = protection_level
 
@@ -46,4 +52,7 @@ class Command:
         return self.name
 
     def __repr__(self):
-        return f"<Name: {self.name} Protected: {self.protected} Level: {self.protection_level}>"
+        return f"<Name: {self.name} " \
+               f"Module: {self.module} " \
+               f"Protected: {self.protected} " \
+               f"Level: {self.protection_level}>"

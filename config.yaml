@@ -5,12 +5,13 @@ bot:
     message:
       prefix: "oopsie whoopsie~ a fucky wucky happened!"
   commands:
-    help:
-      protected: false
-      protection_level: USER
-    test:
-      protected: true
-      protection_level: OWNER
+  # Commands go here
+   - name: default
+     module: "commands.default.default"
+     config: "commands\\default\\config.yaml"
+   - name: dummy
+     module: "commands.testing.dummy"
+     config: "commands\\testing\\config.yaml"
 
 archive:
   message:

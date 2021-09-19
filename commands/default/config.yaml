@@ -1,0 +1,8 @@
+help:
+  function: _help
+  protected: false
+  protection_level: "USER"
+test:
+  function: test
+  protected: true
+  protection_level: "OWNER"

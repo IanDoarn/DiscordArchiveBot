@@ -1,5 +1,6 @@
 import logging
 from typing import Dict, Hashable, Any, Union, List
+import importlib
 
 from discord.message import Message
 from discord.channel import TextChannel
@@ -54,12 +55,18 @@ class SimpleCommandParser:
         else:
             return None
 
-    def execute_command(
+    async def execute_command(
             self,
             cmd: Command,
             content: list
     ) -> Union[Message, None]:
-        ...
+        module = importlib.import_module(cmd.module)
+        function_name = cmd.function
+
+        # execute method
+        result = getattr(module, function_name)(*content[1:])
+        logging.info(f"Executing {module} {function_name}")
+        return await self.message.channel.send(result)
 
     @staticmethod
     def help() -> str:

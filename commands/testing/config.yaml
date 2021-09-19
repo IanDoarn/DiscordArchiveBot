@@ -1,0 +1,4 @@
+lolwut:
+  function: lolwut
+  protected: false
+  protection_level: "USER"
