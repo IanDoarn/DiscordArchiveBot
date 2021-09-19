@@ -7,11 +7,11 @@ bot:
   commands:
   # Commands go here
    - name: default
-     module: "commands.default.default"
-     config: "commands\\default\\config.yaml"
+     module: "src.commands.default.default"
+     config: "src\\commands\\default\\config.yaml"
    - name: dummy
-     module: "commands.testing.dummy"
-     config: "commands\\testing\\config.yaml"
+     module: "src.commands.testing.dummy"
+     config: "src\\commands\\testing\\config.yaml"
 
 archive:
   message:
