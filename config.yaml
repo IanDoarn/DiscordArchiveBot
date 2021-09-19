@@ -1,6 +1,9 @@
 bot:
   command_prefix: "!<"
   owner_discord_name: "baxterthehusky#1003"
+  errors:
+    message:
+      prefix: "oopsie whoopsie~ a fucky wucky happened!"
   commands:
     help:
       protected: false

@@ -53,6 +53,11 @@ class Bot(discord.Client):
             cmds.append(cmd)
         return cmds
 
+    async def handle_exception(self, message: Message, exc: Exception):
+        msg_prefix = self.config["bot"]["errors"]["message"]["prefix"]
+        msg = f"{msg_prefix}: {exc}"
+        await message.channel.send(content=msg)
+
     async def on_ready(self):
         logging.info(f'Logged on as {self.user}')
         logging.info("Loading config file")
@@ -88,7 +93,10 @@ class Bot(discord.Client):
             return
 
         else:
-            await scp.parse_command()
+            try:
+                await scp.parse_command()
+            except Exception as parse_error:
+                await self.handle_exception(message, parse_error)
 
         # if content.lower().startswith(self.command_prefix):
         #     x = parse_command(self.command_prefix, Message)
