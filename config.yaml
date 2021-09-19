@@ -1,6 +1,12 @@
 bot:
   command_prefix: "!<"
   owner_discord_name: "baxterthehusky#1003"
+  commands:
+    help:
+      protected: false
+    test:
+      protected: true
+      protection_level: OWNER
 
 archive:
   message:
