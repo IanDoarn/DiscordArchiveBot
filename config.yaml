@@ -1,0 +1,7 @@
+bot:
+  command_prefix: "!<"
+  owner_discord_name: "baxterthehusky#1003"
+
+archive:
+  message:
+    limit: 1000000

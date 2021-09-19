@@ -1,39 +1,41 @@
+from typing import Dict, Hashable, Any, List
+import json
+import datetime
+import os
+
 import discord
+import logging
+
 from discord.message import Message
 from discord.channel import TextChannel
 from discord.file import File
 from discord.guild import Guild
 
-from typing import List
-import random
-import json
-import datetime
-import os
-import zipfile
+from src.utils import load_yaml_file
 
 
-class MyClient(discord.Client):
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
-    @staticmethod
-    def create_zip_file(filename, zipfile_path):
-        def zipdir(path, ziph):
-            # ziph is zipfile handle
-            for root, dirs, files in os.walk(path):
-                for file in files:
-                    ziph.write(os.path.join(root, file),
-                               os.path.relpath(os.path.join(root, file),
-                                               os.path.join(path, '..')))
 
-        zipf = zipfile.ZipFile(filename, 'w', zipfile.ZIP_DEFLATED)
-        zipdir(zipfile_path, zipf)
-        zipf.close()
+class Bot(discord.Client):
+
+    config: Dict[Hashable, Any] = None
+
+    def __init__(
+            self,
+            config_file: str,
+            *args,
+            **kwargs
+    ) -> None:
+        super().__init__(*args, **kwargs)
+        self.config_file = config_file
 
     async def on_ready(self):
-        print('Logged on as', self.user)
+        logging.info(f'Logged on as {self.user}')
+        logging.info("Loading config file")
+        self.config = load_yaml_file(self.config_file)
 
-        print('Active Guilds')
-        for guild in self.guilds:
-            print(f"{guild.name}")
+        logging.info(f"Bot is ready")
 
     async def on_message(self, message: Message):
         content: str = message.content
@@ -46,13 +48,6 @@ class MyClient(discord.Client):
 
         if message.content == 'ping':
             await message.channel.send('pong')
-
-        if content.lower().startswith("emote?"):
-
-            print(guild.emojis)
-            bot_message = await channel.send(
-                content=random.choice(guild.emojis)
-            )
 
         if content.lower().startswith("download pls"):
             if str(message.author) != "baxterthehusky#1003":
@@ -155,5 +150,5 @@ if __name__ == '__main__':
     with open("client.json", 'r') as f:
         client_secret = json.load(f)
 
-    client = MyClient()
+    client = Bot('config.yaml')
     client.run(client_secret["client_secret"])
