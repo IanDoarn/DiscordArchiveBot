@@ -1,15 +1,11 @@
 from typing import Dict, Hashable, Any, List
 import json
-import os
-import importlib
 
 import discord
 import logging
 
 from discord.message import Message
-from discord.channel import TextChannel
-from discord.file import File
-from discord.guild import Guild
+
 from discord import Game
 from discord import Status
 

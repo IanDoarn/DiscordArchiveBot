@@ -1,1 +1,1 @@
-from .dummy import lolwut
+from .dummy import lolwut, get_channels, ping_author
