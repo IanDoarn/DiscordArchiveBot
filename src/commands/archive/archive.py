@@ -1,10 +1,11 @@
 import logging
-from typing import Dict, Hashable, Any, Collection, Union
+from typing import Dict, Hashable, Any, List
 
 from discord.channel import (
     ChannelType,
     TextChannel
 )
+from discord.message import Message
 from discord.guild import Guild
 
 
@@ -32,40 +33,36 @@ class Archive:
     async def create_guild_archive(self):
         message = await self.working_channel.send(f"Creating archive for {self.guild.name}")
 
-        channels = [x for x in self.guild.channels if x.type == ChannelType.text]
+        channels: List[TextChannel] = [x for x in self.guild.channels if x.type == ChannelType.text]
 
         logging.info(f"Found {len(channels)} in guild {self.guild.name}")
         await message.edit(content=f"{message.content}\nFound {len(channels)} in guild {self.guild.name}")
 
+        for channel in channels:
+            await self.download_messages_from_channel(channel)
+
+    async def download_messages_from_channel(self, channel: TextChannel):
+        message_base = f"Attempting to archive {channel.name}! Limit set to {self.limit}." \
+                       f"\nThis operation will take some time.\n\n"
+        messages: List[Message] = list()
+        counter = 0
+        logging.info(message_base)
+        bot_message = await self.working_channel.send(message_base)
+
+        async for message in channel.history(limit=self.limit, oldest_first=True):
+            msg: Message = message
+            counter += 1
+            if counter % 1000 == 0:
+                await bot_message.edit(content=f"{message_base}Total: {counter}")
+
+        logging.info(f"Collected {len(messages)}")
+        content = f"{message_base}\n"\
+                  f"Gathered {len(messages)} from {channel.name}!\n"\
+                  f"Total: {counter}\n"\
+                  f"Complete!\n"
 
 
-        #
-        #         current_guild: Guild = self.get_guild(guild.id)
-        #         all_channels = current_guild.channels
-        #
-        #         content = f"Found {len(all_channels)} in {str(current_guild)}.\n" \
-        #                   f"Attempting to archive entire server! Downloading data from the below channels:\n\n"
-        #
-        #         for c in all_channels:
-        #             if type(c) == TextChannel:
-        #                 content += str(c) + "\n"
-        #
-        #         await channel.send(
-        #             content=content
-        #         )
-        #
-        #         for guild_channel in all_channels:
-        #             print(guild_channel)
-        #             counter = 0
-        #             messages: List[dict] = []
-        #
-        #             bot_message = await channel.send(
-        #                 content=f"Trying to gather message, limit is {_limit}, from {guild_channel}."
-        #                         f"This will take some time.\nTotal: {counter}",
-        #                 mention_author=True
-        #             )
-        #
-        #             try:
+
         #                 async for elem in guild_channel.history(limit=_limit, oldest_first=True):
         #                     msg: Message = elem
         #

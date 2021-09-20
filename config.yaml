@@ -6,7 +6,7 @@ bot:
       directory: "C:\\Users\\ibd19\\PycharmProjects\\pythonProject\\guilds"
   errors:
     message:
-      prefix: "oopsie whoopsie~ a fucky wucky happened!"
+      prefix: "oopsie whoopsie~ a stinky winky happened!"
   commands:
   # Commands go here
    - name: default

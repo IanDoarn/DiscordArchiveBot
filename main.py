@@ -58,6 +58,9 @@ class Bot(discord.Client):
             activity=self.presence
         )
 
+        for guild in self.guilds:
+            logging.info(f"Bot loaded into {guild.name}")
+
         logging.info(f"Bot is ready")
 
     def load_commands(self) -> List[Command]:
