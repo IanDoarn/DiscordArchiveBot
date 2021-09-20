@@ -74,18 +74,15 @@ class SimpleCommandParser:
 
         # execute method
         logging.info(f"Executing {module} {function_name}")
+        _inputs = (
+            self.message,
+            self.config,
+            *full_command[1:]
+        )
         if inspect.iscoroutinefunction(getattr(module, function_name)):
-            result = await getattr(module, function_name)(
-                self.message,
-                self.config,
-                *full_command[1:]
-            )
+            result = await getattr(module, function_name)(*_inputs)
         else:
-            result = getattr(module, function_name)(
-                self.message,
-                self.config,
-                *full_command[1:]
-            )
+            result = getattr(module, function_name)(*_inputs)
         if result is not None:
             return await self.message.channel.send(result)
 
