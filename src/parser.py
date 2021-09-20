@@ -1,12 +1,13 @@
 import logging
 from typing import Dict, Union, List
 import importlib
+import inspect
 
 from discord.message import Message
 from discord.channel import TextChannel
 from discord.guild import Guild
 
-from src.models.command import Command
+from src.models.command import Command, ProtectionLevel
 
 
 class SimpleCommandParser:
@@ -46,9 +47,24 @@ class SimpleCommandParser:
                 logging.exception(error)
                 raise error
             else:
-                return await self.execute_command(self.commands[content_base_command])
+                cmd: Command = self.commands[content_base_command]
+                if self.can_user_execute_command(cmd, self.message):
+                    return await self.execute_command(cmd)
+                else:
+                    raise PermissionError(f"Not authorized to execute command: {cmd}")
         else:
             return None
+
+    def can_user_execute_command(self, command: Command, message: Message) -> bool:
+        owner_discord_name = self.config["bot"]["owner_discord_name"]
+        if not command.protected:
+            return True
+        else:
+            if command.protection_level == ProtectionLevel.OWNER and str(message.author) != owner_discord_name:
+                return False
+            else:
+                return True
+            # TODO: implement a way to map roles in a server to permission level
 
     async def execute_command(self, cmd: Command) -> Union[Message, None]:
         content: str = self.message.content
@@ -57,12 +73,19 @@ class SimpleCommandParser:
         function_name = cmd.function
 
         # execute method
-        result = getattr(module, function_name)(
-            self.message,
-            self.config,
-            *full_command[1:]
-        )
         logging.info(f"Executing {module} {function_name}")
+        if inspect.iscoroutinefunction(getattr(module, function_name)):
+            result = await getattr(module, function_name)(
+                self.message,
+                self.config,
+                *full_command[1:]
+            )
+        else:
+            result = getattr(module, function_name)(
+                self.message,
+                self.config,
+                *full_command[1:]
+            )
         if result is not None:
             return await self.message.channel.send(result)
 

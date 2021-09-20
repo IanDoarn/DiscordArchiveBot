@@ -60,24 +60,7 @@ class Bot(discord.Client):
             activity=self.presence
         )
 
-        await self.create_guild_mapping()
-
         logging.info(f"Bot is ready")
-
-    async def create_guild_mapping(self):
-        guild_dir = self.config['bot']['guilds']['mapping']['directory']
-        guilds: List[Guild] = self.guilds
-        for guild in guilds:
-            path = os.path.join(guild_dir, guild.name)
-            if not os.path.exists(path):
-                logging.info(f"Creating directory for {guild.name} at {path}")
-                os.mkdir(path)
-                mapper = GuildMapper(guild, path)
-                logging.info(f"Creating mapping for {guild.name} at {path}")
-                mapper.create_guild_map()
-            else:
-                logging.info(f"Found directory for {guild.name} at {path}")
-                pass
 
     def load_commands(self) -> List[Command]:
         cmds: List[Command] = list()

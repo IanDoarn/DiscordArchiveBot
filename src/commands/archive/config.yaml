@@ -2,3 +2,8 @@ archive:
   function: archive
   protected: false
   protection_level: "OWNER"
+
+map:
+  function: map_guild
+  protected: false
+  protection_level: "OWNER"

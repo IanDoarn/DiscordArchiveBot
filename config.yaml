@@ -16,7 +16,6 @@ bot:
      module: "src.commands.archive.commands"
      config: "src\\commands\\archive\\config.yaml"
 
-
 archive:
   directory: "."
   dump:
