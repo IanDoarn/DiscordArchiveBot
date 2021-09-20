@@ -1,30 +1,44 @@
-from typing import Dict, Hashable, Any, List
+import logging
+from typing import Dict, Hashable, Any, Collection, Union
 
-from discord.message import Message
-from discord.channel import TextChannel
+from discord.channel import (
+    ChannelType,
+    TextChannel
+)
 from discord.guild import Guild
 
 
 class Archive:
 
     config: Dict[Hashable, Any]
+    guild: Guild
+    working_channel: TextChannel
 
     # configured setting
     limit: int
 
-    def __init__(self, config: Dict[Hashable, Any]):
+    def __init__(
+            self,
+            config: Dict[Hashable, Any],
+            guild: Guild,
+            working_channel: TextChannel
+    ):
         self.config = config["archive"]
         self.limit = self.config["message"]["limit"]
 
+        self.guild = guild
+        self.working_channel = working_channel
 
-        # if content.lower().startswith(self.command_prefix):
-        #     x = parse_command(self.command_prefix, Message)
-        #     if str(message.author) != self.owner_discord_name:
-        #         bot_message = await channel.send(
-        #             content="Error: not authorized"
-        #         )
-        #     try:
-        #         _limit = 1000000
+    async def create_guild_archive(self):
+        message = await self.working_channel.send(f"Creating archive for {self.guild.name}")
+
+        channels = [x for x in self.guild.channels if x.type == ChannelType.text]
+
+        logging.info(f"Found {len(channels)} in guild {self.guild.name}")
+        await message.edit(content=f"{message.content}\nFound {len(channels)} in guild {self.guild.name}")
+
+
+
         #
         #         current_guild: Guild = self.get_guild(guild.id)
         #         all_channels = current_guild.channels

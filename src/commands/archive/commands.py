@@ -1,19 +1,15 @@
 import asyncio
+import logging
 
 from discord.message import Message
 from discord.guild import Guild
 from discord.channel import TextChannel
 
 from src.commands.archive.archive import Archive
-from src.mapper import GuildMapper
-
 
 
 async def archive(message: Message, config: dict, *args):
-
     guild: Guild = message.guild
-    archiver = Archive(config)
-
     await message.channel.send(f"Creating working channel for {guild.name}")
 
     channel: TextChannel = await guild.create_text_channel(
@@ -21,17 +17,17 @@ async def archive(message: Message, config: dict, *args):
         reason="Creating working channel for acrhive bot"
     )
 
-    await channel.send(f"Creating archive for {guild.name}")
-    await channel.send(f"Poop")
-    await asyncio.sleep(10)
-    await message.channel.send(f"Archiving complete for {guild.name}, deleting {str(channel)}")
-    await channel.delete(reason="Archiving complete")
+    archiver = Archive(config, guild, channel)
+    try:
+        await archiver.create_guild_archive()
 
-
-async def map_guild(message: Message, config: dict, *args):
-    guild: Guild = message.guild
-    mapper = GuildMapper(config, guild)
-    await message.channel.send(f"Creating mapping for {guild.name}")
-    mapper.create_guild_mapping()
+        await asyncio.sleep(10)
+        await message.channel.send(f"Archiving complete for {guild.name}, deleting {str(channel)}")
+        await channel.delete(reason="Archiving complete")
+    except Exception as error:
+        logging.exception(error)
+        await message.channel.send(f"Something went wrong creating archive for {guild.name}, deleting {str(channel)}")
+        await channel.delete(reason=f"Archiving failed {error}")
+        raise
 
 
