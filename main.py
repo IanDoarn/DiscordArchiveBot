@@ -9,12 +9,10 @@ from discord.message import Message
 
 from discord import Game
 from discord import Status
-from discord.guild import Guild
 
 from src.utils import load_yaml_file
 from src.parser import SimpleCommandParser
 from src.models.command import Command, ProtectionLevel
-from src.mapper import GuildMapper
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 

@@ -83,8 +83,6 @@ class SimpleCommandParser:
             result = await getattr(module, function_name)(*_inputs)
         else:
             result = getattr(module, function_name)(*_inputs)
-        if result is not None:
-            return await self.message.channel.send(result)
 
 
 

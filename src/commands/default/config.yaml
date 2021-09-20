@@ -2,3 +2,8 @@ help:
   function: _help
   protected: false
   protection_level: "USER"
+
+hello:
+  function: hello
+  protected: false
+  protection_level: "USER"
