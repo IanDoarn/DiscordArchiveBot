@@ -3,7 +3,7 @@ bot:
   owner_discord_name: "baxterthehusky#1003"
   guilds:
     mapping:
-      directory: "guilds"
+      directory: "C:\\Users\\ibd19\\PycharmProjects\\pythonProject\\guilds"
   errors:
     message:
       prefix: "oopsie whoopsie~ a fucky wucky happened!"

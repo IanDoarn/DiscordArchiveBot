@@ -13,12 +13,14 @@ class GuildMapper:
         self.config = config
         self.guild_dir = self.config['bot']['guilds']['mapping']['directory']
 
-    async def create_guild_mapping(self, guild: Guild):
-        path = os.path.join(self.guild_dir, guild.name)
-        logging.info(f"Creating mapping for {guild.name} at {path}")
+    def create_guild_mapping(self):
+        self.create_directory()
+
+    def create_directory(self):
+        path = os.path.join(self.guild_dir, self.guild.name)
+        logging.info(f"Creating mapping for {self.guild.name} at {path}")
         if not os.path.exists(path):
-            logging.info(f"Creating directory for {guild.name} at {path}")
-            os.mkdir(path)
+            os.makedirs(path)
+            logging.info(f"Created directory for {self.guild.name} at {path}")
         else:
-            logging.info(f"Found directory for {guild.name} at {path}")
-            pass
+            logging.info(f"Found directory for {self.guild.name} at {path}")
